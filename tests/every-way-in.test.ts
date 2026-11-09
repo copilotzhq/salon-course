@@ -1,7 +1,7 @@
 /**
  * The payoff: one salon, every way in at once. Staff at the desk's page,
  * the salon's own concierge in a customer's chat, an assistant over MCP
- * and its widget, a visitor on the site.
+ * and its widget, a visitor on the site, a customer on WhatsApp.
  * The same bookings, live on the desk's tab; the record says who made each,
  * and for whom; and the rules hold at every one of them.
  */
@@ -13,10 +13,21 @@ import type { Actor } from "copilotz";
 import { DESK } from "../app.ts";
 import { front } from "../front.ts";
 import { bookedBy, customer, type Move, salon, sam, seen, widgets } from "./kit.ts";
-import { assistant, visitor } from "./ways.ts";
+import { assistant, graph, NUMBER, visitor, whatsapp } from "./ways.ts";
 
-/** The salon with every way in open, and the concierge on a script. */
-const open = (moves: Move[]) => salon({ moves, plugins: front, settings: { widgets } });
+const dora = { phone: "5511988887777", name: "Dora" };
+
+/** The salon with every way in open (Meta's API a fake), and the concierge on a script. */
+async function open(moves: Move[]) {
+  const meta = graph();
+  const app = await salon({
+    moves,
+    fetch: meta.fetch,
+    plugins: front,
+    settings: { widgets, whatsapp: NUMBER },
+  });
+  return { ...app, meta };
+}
 
 /** What an assistant's widget is given to press its buttons with. */
 type Widget = { grant: string; hints: { thread: string }; tools: Record<string, string> };
@@ -24,12 +35,15 @@ type Widget = { grant: string; hints: { thread: string }; tools: Record<string, 
 type Tab = ReactElement<{ book(slot: string): Promise<unknown> }>;
 
 test("the same bookings, live, from every way in, and the record says who acted for whom", async () => {
-  const { runtime, store } = await open([
+  const { runtime, store, meta } = await open([
     // Bia, in her chat with the concierge.
     { tool: "book", input: { slot: "tue-11" } },
     "Booked: Tuesday at 11:00.",
     // A visitor on the site says hello, then books from the panel.
     "Hello. Pick a time beside the chat.",
+    // Dora, on WhatsApp.
+    { tool: "book", input: { slot: "sat-10" } },
+    "Booked: Saturday at 10:00.",
   ]);
   try {
     // The desk's Bookings tab, open on Sam's screen the whole time.
@@ -64,6 +78,9 @@ test("the same bookings, live, from every way in, and the record says who acted 
     await runtime.idle();
     await site.call("booking.make", { slot: "fri-14", thread });
     await site.close();
+    // 5. A customer on WhatsApp.
+    await whatsapp(runtime, dora, "Saturday 10 please");
+    assert.deepEqual(meta.texts(dora.phone), ["Booked: Saturday at 10:00."]);
 
     // The desk's tab followed every one, as it happened.
     await runtime.idle();
@@ -75,7 +92,9 @@ test("the same bookings, live, from every way in, and the record says who acted 
       "Wed 15:00, for Assistant",
       "Thu 09:00, for Assistant",
       "Fri 14:00, for Site visitor",
+      "Sat 10:00, for Dora",
     ]);
+    assert.match(html, /Every slot is booked\./);
     desk.close();
 
     // The record: who made each, and for whom.
@@ -85,6 +104,7 @@ test("the same bookings, live, from every way in, and the record says who acted 
       "Wed 15:00": "contact by mcp",
       "Thu 09:00": "contact by mcp",
       "Fri 14:00": "contact by web",
+      "Sat 10:00": "agent concierge for contact Dora",
     });
   } finally {
     await runtime.close();
@@ -93,7 +113,9 @@ test("the same bookings, live, from every way in, and the record says who acted 
 
 test("the rules hold at every way in: nobody else can see or cancel Bia's booking", async () => {
   const { runtime, store, concierge } = await open([
-    // Caio's concierge is told to cancel it.
+    // Caio's concierge, and then Dora's on WhatsApp, are each told to cancel it.
+    { tool: "cancel_booking", input: { slot: "tue-10" } },
+    "I couldn't.",
     { tool: "cancel_booking", input: { slot: "tue-10" } },
     "I couldn't.",
   ]);
@@ -132,6 +154,9 @@ test("the rules hold at every way in: nobody else can see or cancel Bia's bookin
     const site = await visitor(runtime, "198.51.100.7");
     await assert.rejects(site.call("booking.cancel", { booking }));
     await site.close();
+    // A customer on WhatsApp, through the concierge.
+    await whatsapp(runtime, dora, "Cancel tue-10");
+    assert.equal(concierge.sent[3].messages.at(-1)?.text, "Error: No booking of yours at tue-10.");
 
     // Bia's booking stands, and the record has nothing else.
     assert.equal(await seen(runtime, "bookings", sam), "Tue 10:00 (tue-10), for Bia");

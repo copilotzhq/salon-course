@@ -8,6 +8,8 @@
  * Staff sign in by name, from this machine only (`devSignIn`): Sam manages
  * the desk. Assistants post to /mcp/salon (ChatGPT needs it public: a
  * tunnel's https address, and `SALON_ORIGIN` set to it, without devSignIn).
+ * With a WhatsApp number's settings (`WHATSAPP_*`), Meta posts its messages
+ * to /hooks/whatsapp/salon.
  */
 import process from "node:process";
 import { randomBytes } from "node:crypto";
@@ -24,6 +26,17 @@ const origin = process.env.SALON_ORIGIN ?? `http://127.0.0.1:${port}`;
 // What MCP's ids are sealed with: 32 bytes or more. A new one each start, unless set.
 const secret = process.env.SALON_SECRET || randomBytes(32).toString("hex");
 const local = new URL(origin).hostname === "127.0.0.1";
+const env = process.env;
+// A WhatsApp number, when all four of Meta's settings are there.
+const number =
+  env.WHATSAPP_PHONE_ID && env.WHATSAPP_TOKEN && env.WHATSAPP_SECRET && env.WHATSAPP_VERIFY
+    ? {
+      phoneId: env.WHATSAPP_PHONE_ID,
+      token: env.WHATSAPP_TOKEN,
+      secret: env.WHATSAPP_SECRET,
+      verify: env.WHATSAPP_VERIFY,
+    }
+    : undefined;
 
 const runtime = await createRuntime({
   store: memoryStore(),
@@ -31,6 +44,7 @@ const runtime = await createRuntime({
     ...plugins({
       openai: process.env.OPENAI_API_KEY,
       links: { origin, secret },
+      ...(number ? { whatsapp: number } : {}),
       // What an assistant draws under a tool's answer: the same View as the web's.
       widgets: widgetsOf({
         code: () => bundle(new URL("./widget.tsx", import.meta.url), { split: false }),

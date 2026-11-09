@@ -9,13 +9,14 @@
  * contacts: each has a chat of their own at the desk (chat's `thread`), and
  * nothing else. The concierge, the salon's agent, answers every chat there.
  * Assistants outside (ChatGPT, Claude, Gemini) come in over MCP, each
- * conversation a contact; so do the site's visitors, by its chat.
+ * conversation a contact; so do the site's visitors, by its chat, and
+ * anyone who writes to the salon's WhatsApp number.
  */
 import { type Actor, definePlugin, type Plugin, type Runtime } from "copilotz";
 import { models } from "copilotz/plugins/models";
 import { chat } from "copilotz/plugins/agents";
 import { access } from "copilotz/plugins/access";
-import { mcp, webLines } from "copilotz/plugins/interfaces";
+import { mcp, webLines, whatsapp } from "copilotz/plugins/interfaces";
 import type { Widgets } from "copilotz/web/server";
 import { bookings } from "./plugins/bookings/mod.ts";
 
@@ -29,6 +30,12 @@ export type Settings = {
   links: { origin: string; secret: string };
   /** The widgets assistants draw (`widgetsOf`): without them, MCP answers in text alone. */
   widgets?: Widgets;
+  /**
+   * A WhatsApp number, open to anyone: Meta's ids, its token, its app's secret, and the token
+   * its webhook is verified with. `quiet`: seconds a burst of messages may go on before the
+   * concierge answers them at once (4 unless said).
+   */
+  whatsapp?: { phoneId: string; token: string; secret: string; verify: string; quiet?: number };
 };
 
 /** The app's settings, for the plugins before it. */
@@ -84,13 +91,26 @@ function salon(settings: Settings): Plugin {
         },
       },
       ...(settings.widgets ? { widgets: settings.widgets } : {}),
+      // A customer who writes to the number is a contact, in a chat of their own at the desk.
+      ...(settings.whatsapp
+        ? { whatsapp: { salon: { in: DESK, agent: "concierge", ...settings.whatsapp } } }
+        : {}),
     },
   });
 }
 
 /** Every plugin the salon runs, in order. */
 export function plugins(settings: Settings): Plugin[] {
-  return [models, chat, ...access, mcp, webLines, bookings, salon(settings)];
+  return [
+    models,
+    chat,
+    ...access,
+    mcp,
+    webLines,
+    ...(settings.whatsapp ? [whatsapp] : []),
+    bookings,
+    salon(settings),
+  ];
 }
 
 /** Sam, and the desk he manages: staff are its members. */

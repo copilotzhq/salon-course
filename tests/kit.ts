@@ -66,6 +66,8 @@ export async function salon(options: {
   moves?: Move[];
   plugins?: Plugin[];
   settings?: Partial<Settings>;
+  /** What plugin code calls outside services with (Meta's Graph API, in WhatsApp's tests). */
+  fetch?: typeof fetch;
 } = {}) {
   const store = memoryStore();
   const concierge = scripted(options.moves ?? []);
@@ -80,6 +82,7 @@ export async function salon(options: {
   });
   const runtime = await createRuntime({
     store,
+    ...(options.fetch ? { fetch: options.fetch } : {}),
     plugins: [...plugins({ links: LINKS, ...options.settings }), script, ...options.plugins ?? []],
   });
   await openDesk(runtime);

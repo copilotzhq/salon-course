@@ -354,3 +354,41 @@ Chapter 8 (`08-a-chat-on-your-site.md`), tag `chapter-8`. Files: `plugins/site/w
 9. **challenge** · `card` "Your challenge" (a New chat button; next: WhatsApp)
    - EN: Add a New chat button, and see what the panel shows. Next: WhatsApp.
    - PT: Adicione um botão de Nova conversa, e veja o que o painel mostra. Próximo: WhatsApp.
+
+## 9 · WhatsApp · WhatsApp
+
+Chapter 9 (`09-whatsapp.md`), tag `chapter-9`. Files: `app.ts` (`whatsapp`), `server.ts`,
+`tests/kit.ts` (`fetch`), `tests/ways.ts` (`graph`, `whatsapp`), `tests/whatsapp.test.ts` (new),
+`tests/every-way-in.test.ts`, `scripts/tour.ts`, `.env.example`.
+
+1. **intro** · `title`
+   - EN: Customers write to the salon's number, and the concierge books for them.
+   - PT: Os clientes escrevem pro número do salão, e o concierge reserva pra eles.
+2. **pain** · `card` "A bot of its own"
+   - EN: A WhatsApp bot is usually its own server, its own sessions, and the booking logic again.
+   - PT: Um bot de WhatsApp costuma ser um servidor próprio, sessões próprias, e a lógica de
+     reservas de novo.
+3. **problem** · `card` "Meta on both ends" (anyone a customer; signed deliveries; offline tests)
+   - EN: Anyone who writes is a customer. Deliveries are checked as Meta's. And tests play Meta on
+     both ends.
+   - PT: Quem escreve é cliente. As entregas são conferidas como da Meta. E os testes fazem a Meta
+     dos dois lados.
+4. **solution** · `type app.ts` (the number), then `server.ts`
+   - EN: A setting and a plugin. The bookings plugin doesn't know WhatsApp exists.
+   - PT: Uma configuração e um plugin. O plugin de reservas nem sabe que o WhatsApp existe.
+5. **solution** · `type tests/ways.ts` (`graph`, `whatsapp`), then `tests/whatsapp.test.ts`
+   - EN: Meta's webhook, signed, in. Meta's API, a fake `fetch`, out. No network.
+   - PT: O webhook da Meta, assinado, entrando. A API da Meta, um `fetch` falso, saindo. Sem rede.
+6. **check** · `run npm run tour`
+   - EN: Five ways in, one desk, one record, with a real model.
+   - PT: Cinco entradas, um balcão, um registro, com um modelo de verdade.
+7. **check** · `run curl` (the webhook check, an unsigned post)
+   - EN: The server answers Meta's check, and refuses what Meta didn't sign.
+   - PT: O servidor responde à verificação da Meta, e recusa o que a Meta não assinou.
+8. **unlocks** · `card` "What this unlocks" (WhatsApp without booking code; tested offline; one
+   desk)
+   - EN: The hardest way in, tested offline, and no booking code of its own.
+   - PT: A entrada mais difícil, testada offline, e sem código de reserva próprio.
+9. **challenge** · `card` "Your challenge" (a delivery sent twice; next: online)
+   - EN: Send the same message twice, as Meta sometimes does. Next: the salon goes online.
+   - PT: Mande a mesma mensagem duas vezes, como a Meta às vezes faz. Próximo: o salão vai pro ar.

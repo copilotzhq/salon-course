@@ -89,3 +89,5 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
    View, drawn inside ChatGPT and Claude, with its buttons as the same Actions.
 8. [A chat on your site](getting-started/08-a-chat-on-your-site.md): anyone who opens the salon's
    site can chat with the concierge, and book from a panel beside the chat.
+9. [WhatsApp](getting-started/09-whatsapp.md): a number open to anyone, with Meta's webhook and API
+   played locally in the tests.

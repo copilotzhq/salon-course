@@ -1,7 +1,7 @@
 /**
  * Every way in, one after another, in memory: staff at the desk, the
  * salon's own concierge in a customer's chat, an assistant over MCP, a
- * visitor on the site. Then
+ * visitor on the site, a customer on WhatsApp (Meta's API played by a fake). Then
  * what the desk sees, and the record. With `OPENAI_API_KEY`, the concierge
  * thinks with OpenAI; without it, with the offline fake model, which echoes.
  *
@@ -13,12 +13,18 @@ import type { Message } from "copilotz/plugins/agents";
 import { memoryStore } from "copilotz/stores/memory";
 import { openDesk, plugins } from "../app.ts";
 import { bookedBy, customer, LINKS, sam, seen } from "../tests/kit.ts";
-import { assistant, visitor } from "../tests/ways.ts";
+import { assistant, graph, NUMBER, visitor, whatsapp } from "../tests/ways.ts";
 
+const meta = graph();
 const store = memoryStore();
 const runtime = await createRuntime({
   store,
-  plugins: plugins({ openai: process.env.OPENAI_API_KEY, links: LINKS }),
+  // Meta's Graph API is the fake; everything else (OpenAI) is the real one.
+  fetch: (input, init) =>
+    String(input instanceof Request ? input.url : input).startsWith("https://graph.facebook.com/")
+      ? meta.fetch(input, init)
+      : fetch(input, init),
+  plugins: plugins({ openai: process.env.OPENAI_API_KEY, links: LINKS, whatsapp: NUMBER }),
 });
 await openDesk(runtime);
 
@@ -52,6 +58,10 @@ const { thread } = await site.call<{ thread: string }>("chat.send", {
 await runtime.idle();
 console.log(`site      › ${await said(thread)}`);
 await site.close();
+
+// A customer on WhatsApp.
+await whatsapp(runtime, { phone: "5511988887777", name: "Dora" }, "Saturday at 10, please.");
+console.log(`whatsapp  › ${meta.texts("5511988887777").at(-1)}`);
 
 console.log(`\nThe desk sees:\n${await seen(runtime, "bookings", sam)}`);
 console.log("\nThe record:");
