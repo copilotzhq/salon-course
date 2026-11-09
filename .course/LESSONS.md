@@ -232,3 +232,42 @@ Chapter 5 (`05-chatgpt-claude-and-gemini-over-mcp.md`), tag `chapter-5`. Files: 
    - EN: Connect Claude Code and book Friday with the desk open. Next: every way in, at once.
    - PT: Conecte o Claude Code e reserve sexta com o balcão aberto. Próximo: todas as entradas de
      uma vez.
+
+## 6 · The same bookings, every way in · As mesmas reservas, por toda entrada
+
+Chapter 6 (`06-the-same-bookings-every-way-in.md`), tag `chapter-6`. Files:
+`tests/every-way-in.test.ts` and `scripts/tour.ts` (new), `tests/kit.ts` (`bookedBy`),
+`package.json` (`tour`).
+
+1. **intro** · `title`
+   - EN: The payoff: one test, three ways in, one desk, one record.
+   - PT: A recompensa: um teste, três entradas, um balcão, um registro.
+2. **pain** · `card` "Several apps, one database"
+   - EN: Each way in passed its own tests. Nobody can show the rules hold at all of them.
+   - PT: Cada entrada passou nos seus testes. Ninguém mostra que as regras valem em todas.
+3. **problem** · `card` "One test" (every change seen; who, for whom; refused everywhere)
+   - EN: One test, every way in, three checks: live, recorded, refused.
+   - PT: Um teste, toda entrada, três conferências: ao vivo, registrado, recusado.
+4. **solution** · `type tests/every-way-in.test.ts` (the first test)
+   - EN: Sam's tab stays open. The page, the agent and an assistant book. The tab follows each.
+   - PT: A aba do Sam fica aberta. A página, o agente e um assistente reservam. A aba acompanha cada
+     uma.
+5. **solution** · `type tests/kit.ts` (`bookedBy`), then the second test
+   - EN: The record says who, and for whom. Then every door tries Bia's booking, and every door
+     refuses.
+   - PT: O registro diz quem, e por quem. Depois toda porta tenta a reserva da Bia, e toda porta
+     recusa.
+6. **check** · `run node --test tests/every-way-in.test.ts`
+   - EN: Two tests, about a second, offline.
+   - PT: Dois testes, cerca de um segundo, offline.
+7. **check** · `run npm run tour`
+   - EN: The tour, with a real model: what each said, what the desk sees, and the record.
+   - PT: O tour, com um modelo de verdade: o que cada um disse, o que o balcão vê, e o registro.
+8. **unlocks** · `card` "What this unlocks" (one app, for people and for AI; proof; an audit trail)
+   - EN: One app, for people and for AI. Proven, not hoped.
+   - PT: Um app, pra pessoas e pra IA. Provado, não esperado.
+9. **challenge** · `card` "Your challenge" (`cancelledBy`; next: the widget)
+   - EN: Have Sam cancel the assistant's booking, and read who did it. Next: three more ways in, and
+     the app doesn't change.
+   - PT: Faça o Sam cancelar a reserva do assistente, e leia quem fez. Próximo: mais três entradas,
+     e o app não muda.

@@ -82,3 +82,6 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
 5. [ChatGPT, Claude and Gemini, over MCP](getting-started/05-chatgpt-claude-and-gemini-over-mcp.md):
    the concierge's tools, opened to assistants outside. Each conversation is a contact with a chat
    of its own, under the same rules.
+6. [The same bookings, every way in](getting-started/06-the-same-bookings-every-way-in.md): the
+   payoff: one test drives the page, the agent and an assistant at once, reads the record of who
+   acted for whom, and proves the rules held at each.

@@ -10,7 +10,14 @@
  * const bia = await customer(runtime, "Bia");
  * ```
  */
-import { type Actor, createRuntime, definePlugin, type Plugin, type Runtime } from "copilotz";
+import {
+  type Actor,
+  createRuntime,
+  definePlugin,
+  type Plugin,
+  type Runtime,
+  type Store,
+} from "copilotz";
 import type { LlmAdapter, LlmRequest } from "copilotz/plugins/models";
 import { memoryStore } from "copilotz/stores/memory";
 import { DESK, openDesk, plugins, type Settings } from "../app.ts";
@@ -96,3 +103,26 @@ export async function seen(runtime: Runtime, view: string, actor: Actor): Promis
 /** An actor as the record names it: "person sam", "agent concierge for contact c-…". */
 export const who = (actor: Actor): string =>
   `${actor.kind} ${actor.id}${actor.for ? ` for ${who(actor.for as Actor)}` : ""}`;
+
+/**
+ * Who made each booking, by its slot's label, from the record (the store's events). A contact
+ * is named by its name, or by the way it came in when it has none (`by mcp`).
+ */
+export async function bookedBy(store: Store): Promise<Record<string, string>> {
+  const contacts = await store.find("contact", {}) as { _id: string; name?: string; via: string }[];
+  const named = (actor: Actor): Actor => {
+    const contact = actor.kind === "contact" ? contacts.find((c) => c._id === actor.id) : undefined;
+    return {
+      ...actor,
+      ...(contact ? { id: contact.name ?? `by ${contact.via}` } : {}),
+      ...(actor.for ? { for: named(actor.for as Actor) } : {}),
+    };
+  };
+  const made: Record<string, string> = {};
+  for (const event of await store.events(0)) {
+    if (event.type !== "booking.created") continue;
+    const { doc } = event.data as { doc: { label: string } };
+    made[doc.label] = who(named(event.actor!));
+  }
+  return made;
+}
