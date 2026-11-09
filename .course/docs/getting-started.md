@@ -91,3 +91,12 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
    site can chat with the concierge, and book from a panel beside the chat.
 9. [WhatsApp](getting-started/09-whatsapp.md): a number open to anyone, with Meta's webhook and API
    played locally in the tests.
+
+**Part 3: online**
+
+10. [Shipping the salon](getting-started/10-shipping-the-salon.md): SQLite, then PostgreSQL with a
+    lease for deploys, a secret that keeps conversations themselves, and a public origin with staff
+    invited by email.
+
+Coming: **11. Signed in from ChatGPT and Claude**, once MCP has sign-in. The assistant books for the
+customer by name, and the record says so.

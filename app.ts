@@ -15,7 +15,7 @@
 import { type Actor, definePlugin, type Plugin, type Runtime } from "copilotz";
 import { models } from "copilotz/plugins/models";
 import { chat } from "copilotz/plugins/agents";
-import { access } from "copilotz/plugins/access";
+import { access, email, emailSignIn } from "copilotz/plugins/access";
 import { mcp, webLines, whatsapp } from "copilotz/plugins/interfaces";
 import type { Widgets } from "copilotz/web/server";
 import { bookings } from "./plugins/bookings/mod.ts";
@@ -36,6 +36,13 @@ export type Settings = {
    * concierge answers them at once (4 unless said).
    */
   whatsapp?: { phoneId: string; token: string; secret: string; verify: string; quiet?: number };
+  /**
+   * Staff signing in by email, where devSignIn can't (a public origin): Resend's API key, and
+   * the address it sends from. Staff are invited (`openDesk`); nobody signs up.
+   */
+  email?: { apiKey: string; from: string };
+  /** Behind a proxy: the header it names callers by, and how many proxies append to it. */
+  caller?: { header: string; hops?: number };
 };
 
 /** The app's settings, for the plugins before it. */
@@ -91,6 +98,14 @@ function salon(settings: Settings): Plugin {
         },
       },
       ...(settings.widgets ? { widgets: settings.widgets } : {}),
+      ...(settings.email
+        ? {
+          email: { adapter: "resend", ...settings.email },
+          emailSignIn: { app: "The salon", signUp: false },
+        }
+        : {}),
+      // Who calls, as the proxy before the app says: what the site's and MCP's limits count by.
+      ...(settings.caller ? { caller: settings.caller } : {}),
       // A customer who writes to the number is a contact, in a chat of their own at the desk.
       ...(settings.whatsapp
         ? { whatsapp: { salon: { in: DESK, agent: "concierge", ...settings.whatsapp } } }
@@ -105,6 +120,7 @@ export function plugins(settings: Settings): Plugin[] {
     models,
     chat,
     ...access,
+    ...(settings.email ? [email, emailSignIn] : []),
     mcp,
     webLines,
     ...(settings.whatsapp ? [whatsapp] : []),
@@ -113,9 +129,17 @@ export function plugins(settings: Settings): Plugin[] {
   ];
 }
 
-/** Sam, and the desk he manages: staff are its members. */
-export async function openDesk(runtime: Runtime): Promise<void> {
+/**
+ * Sam, and the desk he manages: staff are its members. Kept in a store, the desk is there the
+ * next time, so it's made only once. With his email, Sam is invited: a link where he chooses a
+ * password, sent at each start until he has.
+ */
+export async function openDesk(runtime: Runtime, staff?: { email: string }): Promise<void> {
   const sam: Actor = { kind: "person", id: "sam" };
   await runtime.call("person.set", { person: "sam", name: "Sam" });
-  await runtime.call("space.create", { id: DESK, name: "Front desk" }, { actor: sam });
+  await runtime.call("space.create", { id: DESK, name: "Front desk" }, { actor: sam })
+    .catch((error) => {
+      if (error.code !== "duplicate_key") throw error;
+    });
+  if (staff) await runtime.call("email.invite", { email: staff.email, person: "sam", name: "Sam" });
 }

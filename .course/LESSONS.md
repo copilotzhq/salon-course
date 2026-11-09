@@ -392,3 +392,47 @@ Chapter 9 (`09-whatsapp.md`), tag `chapter-9`. Files: `app.ts` (`whatsapp`), `se
 9. **challenge** · `card` "Your challenge" (a delivery sent twice; next: online)
    - EN: Send the same message twice, as Meta sometimes does. Next: the salon goes online.
    - PT: Mande a mesma mensagem duas vezes, como a Meta às vezes faz. Próximo: o salão vai pro ar.
+
+## 10 · Shipping the salon · O salão no ar
+
+Chapter 10 (`10-shipping-the-salon.md`), tag `chapter-10`. Files: `store.ts` (new), `server.ts`
+(`serve`), `app.ts` (`openDesk`, `email`, `caller`), `tests/kept.test.ts` (new), `.env.example`.
+
+1. **intro** · `title`
+   - EN: The salon, kept and online.
+   - PT: O salão, guardado e no ar.
+2. **pain** · `card` "Gone at every restart" (bookings; conversations; two writers)
+   - EN: In memory, a restart loses every booking, and every conversation becomes a stranger.
+   - PT: Na memória, reiniciar perde as reservas, e toda conversa vira uma estranha.
+3. **problem** · `card` "Kept, public, one writer"
+   - EN: Keep everything with the same code, go public without opening the desk, and deploy with one
+     writer.
+   - PT: Guardar tudo com o mesmo código, abrir ao público sem abrir o balcão, e publicar com um só
+     escritor.
+4. **solution** · `type store.ts`
+   - EN: SQLite here, PostgreSQL with one variable, and a lease so one process writes at a time.
+   - PT: SQLite aqui, PostgreSQL com uma variável, e um lease pra um processo escrever por vez.
+5. **solution** · `type server.ts` (`serve`, the secret), then `app.ts` (`openDesk`)
+   - EN: `serve` listens, waits for the lease, then opens. The secret keeps conversations
+     themselves. The desk is made once.
+   - PT: O `serve` escuta, espera o lease, depois abre. O segredo mantém as conversas. O balcão é
+     criado uma vez.
+6. **solution** · `card` "Public" (no dev sign-in; Sam invited by email; callers by the proxy's
+   word)
+   - EN: Public, dev sign-in is out. Sam is invited by email, and callers are counted by the proxy's
+     word.
+   - PT: Em público, o login de dev sai. O Sam é convidado por email, e quem chama é contado pela
+     palavra do proxy.
+7. **check** · `run`: book, stop, start, read; then two processes on PostgreSQL
+   - EN: Stopped and started, the booking is there. On PostgreSQL, the old process hands over.
+   - PT: Parado e reiniciado, a reserva está lá. No PostgreSQL, o processo antigo passa a vez.
+8. **unlocks** · `card` "What this unlocks" (laptop to server; deploys without two writers; online,
+   honestly)
+   - EN: The same salon, laptop to server. One app, for people and for AI, online.
+   - PT: O mesmo salão, do notebook ao servidor. Um app, pra pessoas e pra IA, no ar.
+9. **challenge** · `card` "What's next" (deploy and connect ChatGPT; chapter 11 coming; Build
+   Compass)
+   - EN: Deploy it, and book from ChatGPT. Coming: signed in from ChatGPT and Claude. And the deep
+     track, Build Compass.
+   - PT: Publique, e reserve pelo ChatGPT. Em breve: login pelo ChatGPT e pelo Claude. E a trilha
+     funda, Build Compass.
