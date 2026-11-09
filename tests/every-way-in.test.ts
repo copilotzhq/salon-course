@@ -1,6 +1,7 @@
 /**
  * The payoff: one salon, every way in at once. Staff at the desk's page,
- * the salon's own concierge in a customer's chat, an assistant over MCP.
+ * the salon's own concierge in a customer's chat, an assistant over MCP
+ * and its widget.
  * The same bookings, live on the desk's tab; the record says who made each,
  * and for whom; and the rules hold at every one of them.
  */
@@ -11,11 +12,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { Actor } from "copilotz";
 import { DESK } from "../app.ts";
 import { front } from "../front.ts";
-import { bookedBy, customer, type Move, salon, sam, seen } from "./kit.ts";
+import { bookedBy, customer, type Move, salon, sam, seen, widgets } from "./kit.ts";
 import { assistant } from "./ways.ts";
 
 /** The salon with every way in open, and the concierge on a script. */
-const open = (moves: Move[]) => salon({ moves, plugins: front });
+const open = (moves: Move[]) => salon({ moves, plugins: front, settings: { widgets } });
+
+/** What an assistant's widget is given to press its buttons with. */
+type Widget = { grant: string; hints: { thread: string }; tools: Record<string, string> };
 
 type Tab = ReactElement<{ book(slot: string): Promise<unknown> }>;
 
@@ -43,8 +47,15 @@ test("the same bookings, live, from every way in, and the record says who acted 
       actor: bia.actor,
     });
     await runtime.idle();
-    // 3. An assistant over MCP.
-    await assistant(runtime, "conversation-1").call("book", { slot: "wed-15" });
+    // 3. An assistant over MCP, then the Book button in its widget.
+    const chatgpt = assistant(runtime, "conversation-1");
+    const { answer } = await chatgpt.call("book", { slot: "wed-15" });
+    const widget = answer.result!._meta!["copilotz/widget"] as Widget;
+    await chatgpt.call(widget.tools["booking.make"], {
+      slot: "thu-09",
+      thread: widget.hints.thread,
+      _grant: widget.grant,
+    });
 
     // The desk's tab followed every one, as it happened.
     await runtime.idle();
@@ -54,6 +65,7 @@ test("the same bookings, live, from every way in, and the record says who acted 
       "Tue 10:00, for a walk-in",
       "Tue 11:00, for Bia",
       "Wed 15:00, for Assistant",
+      "Thu 09:00, for Assistant",
     ]);
     desk.close();
 
@@ -62,6 +74,7 @@ test("the same bookings, live, from every way in, and the record says who acted 
       "Tue 10:00": "person sam",
       "Tue 11:00": "agent concierge for contact Bia",
       "Wed 15:00": "contact by mcp",
+      "Thu 09:00": "contact by mcp",
     });
   } finally {
     await runtime.close();
@@ -93,11 +106,18 @@ test("the rules hold at every way in: nobody else can see or cancel Bia's bookin
     });
     await runtime.idle();
     assert.equal(concierge.sent[1].messages.at(-1)?.text, "Error: No booking of yours at tue-10.");
-    // An assistant over MCP.
+    // An assistant over MCP, and its widget's Cancel button with a real grant.
     const chatgpt = assistant(runtime, "conversation-1");
     assert.match((await chatgpt.call("cancel_booking", { slot: "tue-10" })).text!, refused);
     assert.match((await chatgpt.call("book", { slot: "tue-10" })).text!, /Tue 10:00 is taken/);
-    assert.equal((await chatgpt.call("my_bookings")).text, "No bookings.");
+    const { answer } = await chatgpt.call("my_bookings");
+    assert.equal(answer.result!.content![0].text, "No bookings.");
+    const widget = answer.result!._meta!["copilotz/widget"] as Widget;
+    const pressed = await chatgpt.call(widget.tools["booking.cancel"], {
+      booking,
+      _grant: widget.grant,
+    });
+    assert.ok(pressed.failed);
 
     // Bia's booking stands, and the record has nothing else.
     assert.equal(await seen(runtime, "bookings", sam), "Tue 10:00 (tue-10), for Bia");

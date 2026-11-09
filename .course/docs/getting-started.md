@@ -85,3 +85,5 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
 6. [The same bookings, every way in](getting-started/06-the-same-bookings-every-way-in.md): the
    payoff: one test drives the page, the agent and an assistant at once, reads the record of who
    acted for whom, and proves the rules held at each.
+7. [A widget in the assistant](getting-started/07-a-widget-in-the-assistant.md): the desk's Bookings
+   View, drawn inside ChatGPT and Claude, with its buttons as the same Actions.

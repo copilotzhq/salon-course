@@ -20,13 +20,22 @@ import {
 } from "copilotz";
 import type { LlmAdapter, LlmRequest } from "copilotz/plugins/models";
 import { memoryStore } from "copilotz/stores/memory";
+import { widgetsOf } from "copilotz/web/server";
+import { bundle } from "copilotz/web/node";
 import { DESK, openDesk, plugins, type Settings } from "../app.ts";
+import { bookingsWidget } from "../plugins/bookings/web.tsx";
 
 /** Where the app is, and its secret (32 bytes or more). */
 export const LINKS = {
   origin: "https://salon.example",
   secret: "a-secret-for-the-salon-tests-0123456789",
 };
+
+/** The widgets assistants draw, as server.ts makes them: the widget's code bundled once. */
+export const widgets = widgetsOf({
+  code: () => bundle(new URL("../widget.tsx", import.meta.url), { split: false }),
+  plugins: [bookingsWidget],
+});
 
 /** Staff: a person, at the desk. His calls are there (`in`), as a page of the desk says. */
 export const sam: Actor = { kind: "person", id: "sam", in: DESK };

@@ -1,7 +1,7 @@
 /**
  * The salon on the web, on Node: the app's plugins, and the page (Copilotz's
- * `webPage`, with the browser's code bundled as it starts). In memory: it
- * starts empty each time.
+ * `webPage`, with the browser's code bundled as it starts), and the widgets
+ * assistants draw. In memory: it starts empty each time.
  *
  *   npm run dev          # http://127.0.0.1:8080/space/desk
  *
@@ -14,9 +14,10 @@ import { randomBytes } from "node:crypto";
 import { createRuntime, definePlugin } from "copilotz";
 import { memoryStore } from "copilotz/stores/memory";
 import { devSignIn } from "copilotz/plugins/access";
-import { webPage } from "copilotz/web/server";
+import { webPage, widgetsOf } from "copilotz/web/server";
 import { bundle, listen } from "copilotz/web/node";
 import { DESK, openDesk, plugins } from "./app.ts";
+import { bookingsWidget } from "./plugins/bookings/web.tsx";
 
 const port = Number(process.env.PORT ?? 8080);
 const origin = process.env.SALON_ORIGIN ?? `http://127.0.0.1:${port}`;
@@ -27,7 +28,15 @@ const local = new URL(origin).hostname === "127.0.0.1";
 const runtime = await createRuntime({
   store: memoryStore(),
   plugins: [
-    ...plugins({ openai: process.env.OPENAI_API_KEY, links: { origin, secret } }),
+    ...plugins({
+      openai: process.env.OPENAI_API_KEY,
+      links: { origin, secret },
+      // What an assistant draws under a tool's answer: the same View as the web's.
+      widgets: widgetsOf({
+        code: () => bundle(new URL("./widget.tsx", import.meta.url), { split: false }),
+        plugins: [bookingsWidget],
+      }),
+    }),
     ...(local ? [devSignIn] : []),
     webPage,
     definePlugin({

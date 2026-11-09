@@ -271,3 +271,48 @@ Chapter 6 (`06-the-same-bookings-every-way-in.md`), tag `chapter-6`. Files:
      the app doesn't change.
    - PT: Faça o Sam cancelar a reserva do assistente, e leia quem fez. Próximo: mais três entradas,
      e o app não muda.
+
+## 7 · A widget in the assistant · Um widget no assistente
+
+Chapter 7 (`07-a-widget-in-the-assistant.md`), tag `chapter-7`. Files: `widget.tsx` (new),
+`plugins/bookings/web.tsx` (`bookingsWidget`), `app.ts` (`widgets`, the server's tools),
+`server.ts`, `tests/kit.ts` (`widgets`), `tests/mcp.test.ts`, `tests/every-way-in.test.ts`.
+
+1. **intro** · `title`
+   - EN: The desk's screen, drawn inside ChatGPT and Claude, under the answer that booked.
+   - PT: A tela do balcão, desenhada dentro do ChatGPT e do Claude, embaixo da resposta que
+     reservou.
+2. **pain** · `card` "A second frontend"
+   - EN: A widget usually means a second frontend, with its own calls and its own idea of the user.
+   - PT: Um widget costuma ser um segundo frontend, com chamadas próprias e uma ideia própria do
+     usuário.
+3. **problem** · `card` "The same View, the person's buttons" (as the customer; same Actions; not
+   the model's)
+   - EN: Draw the View you have, as the conversation's customer. Its buttons are theirs, not the
+     model's.
+   - PT: Desenhe a View que você já tem, como o cliente da conversa. Os botões são dele, não do
+     modelo.
+4. **solution** · `type plugins/bookings/web.tsx` (`bookingsWidget`), then `widget.tsx`
+   - EN: A third View, the same `salon()`: the item is the call, the chat is the conversation's.
+   - PT: Uma terceira View, o mesmo `salon()`: o item é a chamada, a conversa é a do assistente.
+5. **solution** · `type app.ts` (`widget`, `{ action }` entries), then `server.ts`
+   - EN: Which tools draw it, and which Actions its buttons call, each with a grant.
+   - PT: Quais ferramentas desenham, e quais Actions os botões chamam, cada uma com uma permissão.
+6. **solution** · `card` "Answered ahead" (reads in the View's body; nothing pushed;
+   `copilotz_read`)
+   - EN: The answer carries what the View reads, already answered as the customer. That's why it
+     reads in its own body.
+   - PT: A resposta já leva o que a View lê, respondido como o cliente. Por isso ela lê no próprio
+     corpo.
+7. **check** · `run` the tool's answer (`_meta`), then `run npm test`
+   - EN: The snapshot, the grant, and a forged press refused.
+   - PT: O snapshot, a permissão, e um clique forjado recusado.
+8. **unlocks** · `card` "What this unlocks" (your screen in the assistant; buttons that are Actions;
+   nothing to sync)
+   - EN: One View, three places, and the rules come along. Not yet drawn in a real host: said
+     plainly.
+   - PT: Uma View, três lugares, e as regras vêm junto. Ainda não desenhado num host de verdade:
+     dito com todas as letras.
+9. **challenge** · `card` "Your challenge" (widget on `cancel_booking`; next: the site)
+   - EN: Give `cancel_booking` the widget. Next: a chat on the salon's own site.
+   - PT: Dê o widget ao `cancel_booking`. Próximo: um chat no site do salão.

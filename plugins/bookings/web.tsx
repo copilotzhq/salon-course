@@ -1,7 +1,9 @@
 /**
- * Bookings on the web: a space's Bookings tab, for staff. It reads through
- * the collections' named queries, as whoever is looking, and its buttons
- * call the same Actions as every other way in.
+ * Bookings on the web: one component, drawn two ways. Staff get a space's
+ * Bookings tab; an assistant (ChatGPT, Claude) draws it as a widget under
+ * the tool's answer. It reads through the collections' named queries, as
+ * whoever is looking, and its buttons call the same Actions as every other
+ * way in.
  */
 import type { ReactNode } from "react";
 import { definePlugin, type Plugin, type ViewContext } from "copilotz";
@@ -51,7 +53,8 @@ function Salon({ title, bookings, free, book, cancel }: {
 
 /**
  * The salon as `ctx`'s viewer sees it, and where a booking made here goes. The View reads in its
- * own body, never in a component: what it reads there is what it's observed by.
+ * own body, never in a component: what it reads there is what it's observed by, and what a
+ * widget's snapshot answers ahead.
  */
 const salon = (ctx: Ctx, title: string, where: { thread?: string } = {}) => (
   <Salon
@@ -73,5 +76,14 @@ export const bookingsWeb: Plugin = definePlugin({
   },
   resources: {
     spaceTabs: { bookings: { title: "Bookings", view: "bookings.tab", order: 15 } },
+  },
+});
+
+/** In an assistant: the tool's call is the item, and its chat is the conversation's. */
+export const bookingsWidget: Plugin = definePlugin({
+  name: "bookings-widget",
+  views: {
+    "bookings.widget": (_call: unknown, ctx: Ctx) =>
+      salon(ctx, "Your bookings", { thread: ctx.hints.thread as string }),
   },
 });

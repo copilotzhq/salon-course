@@ -16,6 +16,7 @@ import { models } from "copilotz/plugins/models";
 import { chat } from "copilotz/plugins/agents";
 import { access } from "copilotz/plugins/access";
 import { mcp } from "copilotz/plugins/interfaces";
+import type { Widgets } from "copilotz/web/server";
 import { bookings } from "./plugins/bookings/mod.ts";
 
 /** The salon's space: staff are its members, and every customer's chat is in it. */
@@ -26,6 +27,8 @@ export type Settings = {
   openai?: string;
   /** Where the app is, and a secret of 32 bytes or more: what MCP's ids are made with. */
   links: { origin: string; secret: string };
+  /** The widgets assistants draw (`widgetsOf`): without them, MCP answers in text alone. */
+  widgets?: Widgets;
 };
 
 /** The app's settings, for the plugins before it. */
@@ -69,12 +72,16 @@ function salon(settings: Settings): Plugin {
           instructions: "Book the salon's slots for the person you're helping.",
           tools: {
             list_slots: { annotations: { readOnly: true } },
-            book: {},
-            my_bookings: { annotations: { readOnly: true } },
+            book: { widget: "bookings.widget", invoking: "Booking…", invoked: "Booked." },
+            my_bookings: { annotations: { readOnly: true }, widget: "bookings.widget" },
             cancel_booking: {},
+            // What the widget's buttons do: the same Actions, never the model's to call.
+            book_slot: { action: "booking.make", title: "Book a slot" },
+            cancel_slot: { action: "booking.cancel", title: "Cancel a booking" },
           },
         },
       },
+      ...(settings.widgets ? { widgets: settings.widgets } : {}),
     },
   });
 }
