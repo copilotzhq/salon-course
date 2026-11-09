@@ -1,7 +1,8 @@
 /**
  * What other plugins and the app import from bookings: the shapes of its
  * records and settings. Everything else they reach by name: its Actions
- * (`booking.make`, `booking.cancel`) and its Views (`bookings`, `slots`).
+ * (`booking.make`, `booking.cancel`), its Views (`bookings`, `slots`) and
+ * its tools (`list_slots`, `book`, `my_bookings`, `cancel_booking`).
  */
 
 /** The salon's times, by id: the `slots` resource, which the app sets. */

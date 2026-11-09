@@ -76,3 +76,6 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
 3. [Its own web page](getting-started/03-its-own-web-page.md): the desk on the web: Copilotz's web
    shell with a Bookings tab, drawn by a React View that reads two named queries, as the reader,
    live. Its buttons are the same Actions.
+4. [Its own agent](getting-started/04-its-own-agent.md): the concierge: the salon's agent, with four
+   tools that call the same Actions, a text View for each that the model reads, acting for whoever
+   it talks with.

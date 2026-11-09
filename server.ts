@@ -20,7 +20,7 @@ const port = Number(process.env.PORT ?? 8080);
 const runtime = await createRuntime({
   store: memoryStore(),
   plugins: [
-    ...plugins(),
+    ...plugins({ openai: process.env.OPENAI_API_KEY }),
     devSignIn,
     webPage,
     definePlugin({

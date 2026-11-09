@@ -1,29 +1,63 @@
 /**
- * The salon's test kit: the app as app.ts makes it, in memory. Sam is
- * staff: a person, the manager of the desk. Customers are contacts, each
- * with a chat of their own at the desk.
+ * The salon's test kit: the app as app.ts makes it, in memory, with fakes
+ * only at its edges. The concierge thinks with a scripted model that plays
+ * a list of moves, one per call: something it says, or a tool it calls.
+ * Sam is staff: a person, the manager of the desk. Customers are contacts,
+ * each with a chat of their own at the desk.
  *
  * ```ts
- * const { runtime } = await salon();
+ * const { runtime, concierge } = await salon({ moves: [{ tool: "list_slots" }, "Wed is free."] });
  * const bia = await customer(runtime, "Bia");
  * ```
  */
-import { type Actor, createRuntime, type Plugin, type Runtime } from "copilotz";
+import { type Actor, createRuntime, definePlugin, type Plugin, type Runtime } from "copilotz";
+import type { LlmAdapter, LlmRequest } from "copilotz/plugins/models";
 import { memoryStore } from "copilotz/stores/memory";
 import { DESK, openDesk, plugins } from "../app.ts";
 
 /** Staff: a person, at the desk. His calls are there (`in`), as a page of the desk says. */
 export const sam: Actor = { kind: "person", id: "sam", in: DESK };
 
-/** The salon, in memory: Sam, and the desk he manages. More plugins go after the app's. */
-export async function salon(options: { plugins?: Plugin[] } = {}) {
+/** What the scripted model does when it's called: says something, or calls a tool. */
+export type Move = string | { tool: string; input?: Record<string, unknown> };
+
+/** A model that plays its moves in order, one per call, and keeps what each call sent it. */
+export function scripted(moves: Move[]) {
+  const sent: LlmRequest[] = [];
+  const adapter: LlmAdapter = {
+    async *generate(request) {
+      sent.push(request);
+      const move = moves.shift();
+      if (move === undefined) throw new Error(`The script has no move for call ${sent.length}.`);
+      if (typeof move === "string") yield { type: "text", text: move };
+      else {
+        const call = { id: `call-${sent.length}`, name: move.tool, input: move.input ?? {} };
+        yield { type: "tool_call", call };
+      }
+    },
+  };
+  return { adapter, sent };
+}
+
+/** The salon, in memory: the concierge on a script, Sam, and the desk he manages. */
+export async function salon(options: { moves?: Move[]; plugins?: Plugin[] } = {}) {
   const store = memoryStore();
+  const concierge = scripted(options.moves ?? []);
+  // The `concierge` model alias, swapped for the script: a provider and its adapter.
+  const script = definePlugin({
+    name: "test-script",
+    resources: {
+      provider: { script: { adapter: "script" } },
+      model: { concierge: "script/concierge" },
+    },
+    adapters: { llm: { script: concierge.adapter } },
+  });
   const runtime = await createRuntime({
     store,
-    plugins: [...plugins(), ...options.plugins ?? []],
+    plugins: [...plugins(), script, ...options.plugins ?? []],
   });
   await openDesk(runtime);
-  return { runtime, store };
+  return { runtime, store, concierge };
 }
 
 /** A customer: a contact with a chat of its own at the desk. */
@@ -48,3 +82,7 @@ export async function seen(runtime: Runtime, view: string, actor: Actor): Promis
     observed.close();
   }
 }
+
+/** An actor as the record names it: "person sam", "agent concierge for contact c-…". */
+export const who = (actor: Actor): string =>
+  `${actor.kind} ${actor.id}${actor.for ? ` for ${who(actor.for as Actor)}` : ""}`;

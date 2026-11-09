@@ -3,7 +3,9 @@
  *
  * - **Who may call what** is the Actions' `allow`: people and contacts, and
  *   an agent working for one, may call `booking.make` and `booking.cancel`,
- *   and each runs as its caller.
+ *   and each runs as its caller. The tools (`list_slots`, `book`,
+ *   `my_bookings`, `cancel_booking`) call them for whoever the agent works
+ *   for, and `allow` is asked of both.
  * - **The rules** are one line (the `shared` resource): a booking lives in
  *   a space, and is part of the chat it was made in. Staff, members of the
  *   space, reach every booking there. A customer, a contact, reaches only
@@ -11,7 +13,8 @@
  *   checked, whoever calls.
  * - **What anyone sees** is two named queries (`booking.reached`,
  *   `slot_taken.open`), drawn by a View per medium: text (`bookings`,
- *   `slots`), and the web's (web.tsx).
+ *   `slots`, and a `tool:<name>` View for each tool, what a model reads),
+ *   and the web's (web.tsx).
  *
  * Whether a slot is taken is kept apart (`slot_taken`), with no rule: only
  * plugin code reads it, so a customer learns a slot is gone, never whose it is.
@@ -19,7 +22,8 @@
 import { definePlugin, failure, type Plugin } from "copilotz";
 import { cancelAction, makeAction } from "./actions.ts";
 import { open, reached } from "./queries.ts";
-import { bookingsView, slotsView } from "./views.ts";
+import { bookingsView, slotsView, toolViews } from "./views.ts";
+import { tools } from "./tools.ts";
 
 export * from "./contract.ts";
 
@@ -51,10 +55,12 @@ export const bookings: Plugin = definePlugin({
     },
   },
   actions: { "booking.make": makeAction, "booking.cancel": cancelAction },
-  views: { bookings: bookingsView, slots: slotsView },
+  views: { bookings: bookingsView, slots: slotsView, ...toolViews },
   resources: {
     // The rules, at the data: a booking is in a space, and part of its chat.
     shared: { booking: { part: "thread" } },
+    // What a model may call: chat's `tools`, each read back through its `tool:<name>` View.
+    tools,
     // The salon's times: the app sets its own.
     slots: {},
   },

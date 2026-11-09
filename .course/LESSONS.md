@@ -142,3 +142,49 @@ Chapter 3 (`03-its-own-web-page.md`), tag `chapter-3`. Files: `plugins/bookings/
 9. **challenge** · `card` "Your challenge" (two windows; link to the chat; next: an agent)
    - EN: Open two windows and book in one. Next: the salon's own agent.
    - PT: Abra duas janelas e reserve numa. Próximo: o agente do salão.
+
+## 4 · Its own agent · Um agente só seu
+
+Chapter 4 (`04-its-own-agent.md`), tag `chapter-4`. Files: `app.ts` (the concierge, `Settings`),
+`plugins/bookings/tools.ts` and `terminal.ts` (new), `views.ts` (`tool:` Views), `mod.ts`,
+`contract.ts`, `server.ts`, `terminal.ts`, `tests/kit.ts` (`scripted`), `tests/agent.test.ts` (a
+staff-only tool, last), `package.json` (`terminal`).
+
+1. **intro** · `title`
+   - EN: The salon gets an agent, the concierge, and it books with the customer's limits, not the
+     database's.
+   - PT: O salão ganha um agente, o concierge, que reserva com os limites do cliente, não do banco.
+2. **pain** · `card` "A bot with a master key"
+   - EN: A bot with a service account cancels anyone's booking, if it's asked nicely.
+   - PT: Um bot com conta de serviço cancela a reserva de qualquer um, se pedirem com jeito.
+3. **problem** · `card` "For someone" (reach what they reach; the same Actions; short text)
+   - EN: The agent acts for the person it talks with. And a model reads differently: short lines,
+     with ids.
+   - PT: O agente age pela pessoa com quem fala. E um modelo lê diferente: linhas curtas, com ids.
+4. **solution** · `type app.ts` (agent, model alias)
+   - EN: The concierge: instructions, a model by its alias, four tools.
+   - PT: O concierge: instruções, um modelo pelo apelido, quatro ferramentas.
+5. **solution** · `type plugins/bookings/tools.ts`, then `views.ts`
+   - EN: Each tool calls an Action, as the agent for its customer. After each one, the model reads
+     its View.
+   - PT: Cada ferramenta chama uma Action, como o agente pelo cliente. Depois de cada uma, o modelo
+     lê a View dela.
+6. **solution** · `type tests/kit.ts` (`scripted`), then `tests/agent.test.ts`
+   - EN: A scripted model plays the agent's moves. Told to cancel Bia's slot, Caio's concierge can't
+     find it. Given a staff-only tool, it's refused in Bia's chat, and runs for Sam.
+   - PT: Um modelo roteirizado faz os lances do agente. Mandado cancelar o horário da Bia, o
+     concierge do Caio não acha. Com uma ferramenta só da equipe, ele é recusado na conversa da Bia,
+     e roda pro Sam.
+7. **check** · `run npm run terminal`: "Book Thursday 9 for Rui", then `/bookings`
+   - EN: In the terminal, with a real model: it lists, it books, and `/bookings` shows Rui.
+   - PT: No terminal, com um modelo de verdade: lista, reserva, e o `/bookings` mostra o Rui.
+8. **unlocks** · `card` "What this unlocks" (tool, Action, the world; the customer's limits; tests
+   without a model)
+   - EN: Tell the agent anything: it reaches what its customer reaches, calls only what they may,
+     and the record says for whom.
+   - PT: Diga qualquer coisa ao agente: ele alcança o que o cliente alcança, só chama o que ele
+     pode, e o registro diz por quem.
+9. **challenge** · `card` "Your challenge" (`next_free`; next: MCP)
+   - EN: Give it a `next_free` tool. Next: the same tools, for ChatGPT, Claude and Gemini.
+   - PT: Dê a ele uma ferramenta `next_free`. Próximo: as mesmas ferramentas, pro ChatGPT, Claude e
+     Gemini.
