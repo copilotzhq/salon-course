@@ -8,17 +8,20 @@
  * const bia = await customer(runtime, "Bia");
  * ```
  */
-import { type Actor, createRuntime, type Runtime } from "copilotz";
+import { type Actor, createRuntime, type Plugin, type Runtime } from "copilotz";
 import { memoryStore } from "copilotz/stores/memory";
 import { DESK, openDesk, plugins } from "../app.ts";
 
 /** Staff: a person, at the desk. His calls are there (`in`), as a page of the desk says. */
 export const sam: Actor = { kind: "person", id: "sam", in: DESK };
 
-/** The salon, in memory: Sam, and the desk he manages. */
-export async function salon() {
+/** The salon, in memory: Sam, and the desk he manages. More plugins go after the app's. */
+export async function salon(options: { plugins?: Plugin[] } = {}) {
   const store = memoryStore();
-  const runtime = await createRuntime({ store, plugins: plugins() });
+  const runtime = await createRuntime({
+    store,
+    plugins: [...plugins(), ...options.plugins ?? []],
+  });
   await openDesk(runtime);
   return { runtime, store };
 }

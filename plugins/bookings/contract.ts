@@ -21,3 +21,9 @@ export type Booking = {
   /** Who it's for, when staff book at the desk without a chat. */
   name?: string;
 };
+
+/** A booking as anyone sees it, and whom it's for: the name staff gave, its chat's, a walk-in. */
+export type Reached = Booking & { for: string };
+
+/** A slot nobody has booked yet. */
+export type Free = { slot: string; label: string };

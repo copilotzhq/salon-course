@@ -101,3 +101,44 @@ Chapter 2 (`02-who-sees-what.md`), tag `chapter-2`. Files: `plugins/bookings/*` 
 9. **challenge** · `card` "Your challenge" (`booking.move`; next: the web page)
    - EN: Write `booking.move`, and test that Caio can't move Bia's. Next: the desk on the web.
    - PT: Escreva o `booking.move`, e teste que o Caio não move a da Bia. Próximo: o balcão na web.
+
+## 3 · Its own web page · Uma página só sua
+
+Chapter 3 (`03-its-own-web-page.md`), tag `chapter-3`. Files: `plugins/bookings/queries.ts` and
+`web.tsx` (new), `views.ts`, `mod.ts`, `contract.ts`, `front.ts`, `browser.tsx`, `server.ts`,
+`tsx.ts`, `tests/kit.ts`, `tests/web.test.ts`, `package.json` (`dev`, `test`).
+
+1. **intro** · `title`
+   - EN: The desk gets a screen: a Bookings tab, live, whose buttons are the same Actions.
+   - PT: O balcão ganha uma tela: uma aba de reservas, ao vivo, com botões que são as mesmas
+     Actions.
+2. **pain** · `card` "A second home for the rules" (an endpoint per screen; polling)
+   - EN: A screen usually means an endpoint, a frontend that repeats the server, and a timer that
+     polls.
+   - PT: Uma tela costuma ser um endpoint, um frontend que repete o servidor, e um timer
+     perguntando.
+3. **problem** · `card` "As its reader" (what the reader may see; live; the same Actions)
+   - EN: The page should read as its reader, follow every change, and never read what it can't:
+     `slot_taken`.
+   - PT: A página deve ler como quem lê, seguir cada mudança, e nunca ler o que não pode: o
+     `slot_taken`.
+4. **solution** · `type plugins/bookings/queries.ts`
+   - EN: Two named queries, run on the server as the reader. One read, for every medium.
+   - PT: Duas queries nomeadas, no servidor, como quem lê. Uma leitura pra todo meio.
+5. **solution** · `type plugins/bookings/web.tsx`, then `front.ts`, `browser.tsx`, `server.ts`
+   - EN: The View reads in its own body and hands a React component the result. One `spaceTabs`
+     entry puts the tab on the desk, and its Book is where the page is: the desk.
+   - PT: A View lê no próprio corpo e entrega o resultado a um componente React. Uma entrada em
+     `spaceTabs` põe a aba no balcão, e o Reservar dela é onde a página está: o balcão.
+6. **check** · `browser`: sign in as `sam`, Bookings tab, Book Tue 10:00
+   - EN: Sign in as Sam, open Bookings, press Book. The tab redraws, with no reload.
+   - PT: Entre como Sam, abra Reservas, aperte Reservar. A aba se redesenha, sem recarregar.
+7. **check** · `run npm test`
+   - EN: The test presses the same buttons, and a customer books elsewhere: the tab follows.
+   - PT: O teste aperta os mesmos botões, e um cliente reserva em outro lugar: a aba acompanha.
+8. **unlocks** · `card` "What this unlocks" (a View per medium; live by default; no second home)
+   - EN: Text for models, React for people, the same reads under both.
+   - PT: Texto pra modelos, React pra pessoas, as mesmas leituras por baixo.
+9. **challenge** · `card` "Your challenge" (two windows; link to the chat; next: an agent)
+   - EN: Open two windows and book in one. Next: the salon's own agent.
+   - PT: Abra duas janelas e reserve numa. Próximo: o agente do salão.

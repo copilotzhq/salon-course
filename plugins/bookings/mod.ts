@@ -9,12 +9,16 @@
  *   space, reach every booking there. A customer, a contact, reaches only
  *   their own chat, so only their own bookings. Reads are filtered, writes
  *   checked, whoever calls.
+ * - **What anyone sees** is two named queries (`booking.reached`,
+ *   `slot_taken.open`), drawn by a View per medium: text (`bookings`,
+ *   `slots`), and the web's (web.tsx).
  *
  * Whether a slot is taken is kept apart (`slot_taken`), with no rule: only
  * plugin code reads it, so a customer learns a slot is gone, never whose it is.
  */
 import { definePlugin, failure, type Plugin } from "copilotz";
 import { cancelAction, makeAction } from "./actions.ts";
+import { open, reached } from "./queries.ts";
 import { bookingsView, slotsView } from "./views.ts";
 
 export * from "./contract.ts";
@@ -35,6 +39,7 @@ export const bookings: Plugin = definePlugin({
         },
         required: ["slot", "label", "in"],
       },
+      queries: { reached },
     },
     slot_taken: {
       schema: {
@@ -42,6 +47,7 @@ export const bookings: Plugin = definePlugin({
         properties: { booking: { type: "string" } },
         required: ["booking"],
       },
+      queries: { open },
     },
   },
   actions: { "booking.make": makeAction, "booking.cancel": cancelAction },

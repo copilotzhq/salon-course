@@ -70,3 +70,9 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
 2. [Who sees what](getting-started/02-who-sees-what.md): staff and customers: people and contacts, a
    space for the desk, and one rule at the data that filters every read and checks every write,
    whoever calls. Then the first tests.
+
+**Part 2: the ways in**
+
+3. [Its own web page](getting-started/03-its-own-web-page.md): the desk on the web: Copilotz's web
+   shell with a Bookings tab, drawn by a React View that reads two named queries, as the reader,
+   live. Its buttons are the same Actions.

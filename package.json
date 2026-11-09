@@ -19,7 +19,8 @@
     "typescript": "6.0.3"
   },
   "scripts": {
-    "test": "node --disable-warning=ExperimentalWarning --test --test-timeout=60000 --test-concurrency=1 \"tests/*.test.ts\"",
+    "dev": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env --import ./tsx.ts server.ts",
+    "test": "node --disable-warning=ExperimentalWarning --import ./tsx.ts --test --test-timeout=60000 --test-concurrency=1 \"tests/*.test.ts\"",
     "check": "tsc --noEmit -p ."
   }
 }
