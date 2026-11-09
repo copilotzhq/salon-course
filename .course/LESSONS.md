@@ -55,3 +55,49 @@ Chapter 1 (`01-one-booking.md`), tag `chapter-1`. Files: `plugins/bookings/{mod,
      own.
    - PT: Adicione sábado às 11, e reserve um horário que não existe. Próximo: clientes, que só veem
      as suas.
+
+## 2 · Who sees what · Quem vê o quê
+
+Chapter 2 (`02-who-sees-what.md`), tag `chapter-2`. Files: `plugins/bookings/*` (`contract.ts` new),
+`app.ts` (`openDesk`), `tests/kit.ts` (`sam`, at the desk), `tests/bookings.test.ts`,
+`package.json`; `hello.ts` goes.
+
+1. **intro** · `title`
+   - EN: Customers arrive, and now bookings are private. Staff see all; a customer sees their own.
+   - PT: Chegam os clientes, e as reservas viram privadas. A equipe vê todas; o cliente, só as dele.
+2. **pain** · `card` "A filter in every handler"
+   - EN: The usual fix is an `if` in every handler. The fifth way in forgets it.
+   - PT: O conserto de sempre é um `if` em cada handler. A quinta entrada esquece.
+3. **problem** · `card` "At the data" (once; every caller; taken, not whose)
+   - EN: The rule belongs where the data is: written once, holding for every caller. And "taken"
+     must never say by whom.
+   - PT: A regra mora onde o dado mora: escrita uma vez, valendo pra todo mundo. E "ocupado" nunca
+     diz por quem.
+4. **solution** · `type app.ts` (`access`, `openDesk`)
+   - EN: People are staff, the desk is a space, Sam manages it. Customers are contacts, each with a
+     chat of their own.
+   - PT: Pessoas são a equipe, o balcão é um space, o Sam gerencia. Clientes são contatos, cada um
+     com sua conversa.
+5. **solution** · `type plugins/bookings/mod.ts` (`shared`, `slot_taken`, `guard`), then
+   `actions.ts`
+   - EN: One line: a booking lives in the desk and is part of its chat. Reads are filtered, writes
+     checked. The Action runs as its caller, where the call is, in one transaction.
+   - PT: Uma linha: a reserva mora no balcão e faz parte da conversa. Leituras filtradas, escritas
+     conferidas. A Action roda como quem chama, onde a chamada está, numa transação.
+6. **solution** · `card` "Who may call" (`peopleOrContacts`; asked of tools too; `inPerson`)
+   - EN: `allow` is asked of every caller, the app's own tools too. An agent calls only what it and
+     its customer may.
+   - PT: O `allow` é perguntado a todo mundo que chama, até às ferramentas do próprio app. Um agente
+     só chama o que ele e o cliente dele podem.
+7. **check** · `run npm test`
+   - EN: Sam sees three bookings, Bia one, Caio one. Caio's tries are refused, by the rule, not by
+     an `if`.
+   - PT: O Sam vê três reservas, a Bia uma, o Caio uma. As tentativas do Caio são recusadas, pela
+     regra, não por um `if`.
+8. **unlocks** · `card` "What this unlocks" (rules that come with the data; no leaks; all or
+   nothing)
+   - EN: Every way in you add inherits the rule, with no line of its own.
+   - PT: Toda entrada nova herda a regra, sem uma linha própria.
+9. **challenge** · `card` "Your challenge" (`booking.move`; next: the web page)
+   - EN: Write `booking.move`, and test that Caio can't move Bia's. Next: the desk on the web.
+   - PT: Escreva o `booking.move`, e teste que o Caio não move a da Bia. Próximo: o balcão na web.

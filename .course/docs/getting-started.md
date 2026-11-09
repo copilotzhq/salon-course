@@ -67,3 +67,6 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
 
 1. [One booking](getting-started/01-one-booking.md): a salon's bookings as a Copilotz plugin: a
    collection, an Action, a View and a resource. Sam books a slot, and the record says he did.
+2. [Who sees what](getting-started/02-who-sees-what.md): staff and customers: people and contacts, a
+   space for the desk, and one rule at the data that filters every read and checks every write,
+   whoever calls. Then the first tests.

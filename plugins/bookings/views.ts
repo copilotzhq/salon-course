@@ -1,12 +1,28 @@
-/** What anyone sees of bookings, as text: one line each, in the salon's order. */
+/**
+ * What anyone sees of bookings, as text. Each View reads as whoever is
+ * looking, so the rules have filtered the bookings before a line is
+ * written: staff get every one in their space, a customer only their own.
+ */
 import type { ViewContext } from "copilotz";
+import type { Booking } from "./contract.ts";
 import { slotsOf } from "./actions.ts";
-
-type Booking = { _id: string; slot: string; label: string };
 
 export const bookingsView = (_: unknown, ctx: ViewContext<unknown>): string => {
   const order = Object.keys(slotsOf(ctx));
   const found = (ctx.db.collection<Booking>("booking").find({}).value ?? [])
     .toSorted((a, b) => order.indexOf(a.slot) - order.indexOf(b.slot));
-  return found.length ? found.map((b) => `${b.label} (${b.slot})`).join("\n") : "No bookings.";
+  if (!found.length) return "No bookings.";
+  const chats = ctx.db.collection<{ title?: string }>("thread");
+  // Whom it's for: the name staff gave, its chat's, or a walk-in.
+  const whom = (b: Booking) =>
+    b.name ?? (b.thread && chats.findOne({ _id: b.thread }).value?.title) ?? "a walk-in";
+  return found.map((b) => `${b.label} (${b.slot}), for ${whom(b)}`).join("\n");
+};
+
+export const slotsView = (_: unknown, ctx: ViewContext<unknown>): string => {
+  const taken = new Set((ctx.db.collection("slot_taken").find({}).value ?? []).map((t) => t._id));
+  const free = Object.entries(slotsOf(ctx)).filter(([slot]) => !taken.has(slot));
+  return free.length
+    ? `Free: ${free.map(([slot, label]) => `${label} (${slot})`).join(", ")}.`
+    : "Every slot is booked.";
 };
