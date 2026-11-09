@@ -1,9 +1,9 @@
 /**
- * Bookings on the web: one component, drawn two ways. Staff get a space's
- * Bookings tab; an assistant (ChatGPT, Claude) draws it as a widget under
- * the tool's answer. It reads through the collections' named queries, as
- * whoever is looking, and its buttons call the same Actions as every other
- * way in.
+ * Bookings on the web: one component, drawn three ways. Staff get a space's
+ * Bookings tab; a customer on the site gets a panel beside their chat; an
+ * assistant (ChatGPT, Claude) draws it as a widget under the tool's answer.
+ * It reads through the collections' named queries, as whoever is looking,
+ * and its buttons call the same Actions as every other way in.
  */
 import type { ReactNode } from "react";
 import { definePlugin, type Plugin, type ViewContext } from "copilotz";
@@ -73,6 +73,9 @@ export const bookingsWeb: Plugin = definePlugin({
     // A space's Bookings tab: every booking there. Booked here, it's a walk-in, where the page
     // is: the call is in its space.
     "bookings.tab": (_space: unknown, ctx: Ctx) => salon(ctx, "Bookings"),
+    // A customer on the site: beside their chat. Booked here, it's in that chat.
+    "bookings.panel": (chat: { _id: string }, ctx: Ctx) =>
+      salon(ctx, "Your bookings", { thread: chat._id }),
   },
   resources: {
     spaceTabs: { bookings: { title: "Bookings", view: "bookings.tab", order: 15 } },

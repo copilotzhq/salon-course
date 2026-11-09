@@ -87,3 +87,5 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
    acted for whom, and proves the rules held at each.
 7. [A widget in the assistant](getting-started/07-a-widget-in-the-assistant.md): the desk's Bookings
    View, drawn inside ChatGPT and Claude, with its buttons as the same Actions.
+8. [A chat on your site](getting-started/08-a-chat-on-your-site.md): anyone who opens the salon's
+   site can chat with the concierge, and book from a panel beside the chat.

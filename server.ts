@@ -3,7 +3,7 @@
  * `webPage`, with the browser's code bundled as it starts), and the widgets
  * assistants draw. In memory: it starts empty each time.
  *
- *   npm run dev          # http://127.0.0.1:8080/space/desk
+ *   npm run dev          # http://127.0.0.1:8080/space/desk for staff, / for customers
  *
  * Staff sign in by name, from this machine only (`devSignIn`): Sam manages
  * the desk. Assistants post to /mcp/salon (ChatGPT needs it public: a
@@ -50,7 +50,9 @@ const runtime = await createRuntime({
 await openDesk(runtime);
 
 const server = await listen(runtime.fetch, { hostname: "127.0.0.1", port });
-console.log(`The salon on ${server.url}space/${DESK}, and assistants' MCP at ${origin}/mcp/salon`);
+console.log(
+  `The salon's site on ${server.url}, the desk at /space/${DESK}, MCP at ${origin}/mcp/salon`,
+);
 process.once("SIGINT", async () => {
   await server.shutdown();
   await runtime.close({ drain: 8_000 });

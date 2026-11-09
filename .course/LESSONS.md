@@ -316,3 +316,41 @@ Chapter 7 (`07-a-widget-in-the-assistant.md`), tag `chapter-7`. Files: `widget.t
 9. **challenge** · `card` "Your challenge" (widget on `cancel_booking`; next: the site)
    - EN: Give `cancel_booking` the widget. Next: a chat on the salon's own site.
    - PT: Dê o widget ao `cancel_booking`. Próximo: um chat no site do salão.
+
+## 8 · A chat on your site · Um chat no seu site
+
+Chapter 8 (`08-a-chat-on-your-site.md`), tag `chapter-8`. Files: `plugins/site/web.tsx` (new),
+`plugins/bookings/web.tsx` (`bookings.panel`), `app.ts` (`webLines`, `web`), `front.ts` (`site`),
+`browser.tsx`, `server.ts`, `tests/ways.ts` (`visitor`), `tests/site.test.ts` (new),
+`tests/every-way-in.test.ts`, `scripts/tour.ts`.
+
+1. **intro** · `title`
+   - EN: Anyone who opens the salon's site can chat with the concierge, and book beside the chat.
+   - PT: Quem abrir o site do salão conversa com o concierge, e reserva do lado da conversa.
+2. **pain** · `card` "A vendor's widget, a form"
+   - EN: A vendor's chat knows nothing of your bookings, and a form knows nothing of the chat.
+   - PT: O chat de um fornecedor não sabe das suas reservas, e um formulário não sabe do chat.
+3. **problem** · `card` "A stranger, a customer" (no account; their own chat; the desk sees)
+   - EN: The first message makes a visitor a customer, with a chat of their own and nothing else.
+   - PT: A primeira mensagem faz do visitante um cliente, com uma conversa só dele e nada mais.
+4. **solution** · `type app.ts` (`web.site`)
+   - EN: One setting declares the site's chat: its space, its agent, what its chats are called.
+   - PT: Uma configuração declara o chat do site: o space, o agente, o nome das conversas.
+5. **solution** · `type plugins/site/web.tsx`, then `front.ts`, `browser.tsx`
+   - EN: The web shell doesn't draw a visitor's page yet, so the salon draws its own: the chat
+     beside the panel.
+   - PT: O shell da web ainda não desenha a página de um visitante, então o salão desenha a sua: o
+     chat do lado do painel.
+6. **check** · `browser`: a visitor's two messages, Book beside Fri 14:00
+   - EN: Ask, book by hand, ask again: the concierge sees what the panel did.
+   - PT: Pergunte, reserve na mão, pergunte de novo: o concierge vê o que o painel fez.
+7. **check** · `run npm test`
+   - EN: The test is a browser: it comes in, keeps its cookie, and draws the page as the visitor.
+   - PT: O teste é um navegador: entra, guarda o cookie, e desenha a página como o visitante.
+8. **unlocks** · `card` "What this unlocks" (your site, open to anyone; chat and buttons together;
+   the same View)
+   - EN: Open to anyone, and still each visitor reaches only their own.
+   - PT: Aberto pra qualquer um, e cada visitante só alcança o seu.
+9. **challenge** · `card` "Your challenge" (a New chat button; next: WhatsApp)
+   - EN: Add a New chat button, and see what the panel shows. Next: WhatsApp.
+   - PT: Adicione um botão de Nova conversa, e veja o que o painel mostra. Próximo: WhatsApp.

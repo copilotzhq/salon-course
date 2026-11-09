@@ -1,7 +1,7 @@
 /**
  * The payoff: one salon, every way in at once. Staff at the desk's page,
  * the salon's own concierge in a customer's chat, an assistant over MCP
- * and its widget.
+ * and its widget, a visitor on the site.
  * The same bookings, live on the desk's tab; the record says who made each,
  * and for whom; and the rules hold at every one of them.
  */
@@ -13,7 +13,7 @@ import type { Actor } from "copilotz";
 import { DESK } from "../app.ts";
 import { front } from "../front.ts";
 import { bookedBy, customer, type Move, salon, sam, seen, widgets } from "./kit.ts";
-import { assistant } from "./ways.ts";
+import { assistant, visitor } from "./ways.ts";
 
 /** The salon with every way in open, and the concierge on a script. */
 const open = (moves: Move[]) => salon({ moves, plugins: front, settings: { widgets } });
@@ -28,6 +28,8 @@ test("the same bookings, live, from every way in, and the record says who acted 
     // Bia, in her chat with the concierge.
     { tool: "book", input: { slot: "tue-11" } },
     "Booked: Tuesday at 11:00.",
+    // A visitor on the site says hello, then books from the panel.
+    "Hello. Pick a time beside the chat.",
   ]);
   try {
     // The desk's Bookings tab, open on Sam's screen the whole time.
@@ -56,6 +58,12 @@ test("the same bookings, live, from every way in, and the record says who acted 
       thread: widget.hints.thread,
       _grant: widget.grant,
     });
+    // 4. A visitor on the site: a hello, then the panel's Book button.
+    const site = await visitor(runtime, "198.51.100.7");
+    const { thread } = await site.call<{ thread: string }>("chat.send", { text: "Hi" });
+    await runtime.idle();
+    await site.call("booking.make", { slot: "fri-14", thread });
+    await site.close();
 
     // The desk's tab followed every one, as it happened.
     await runtime.idle();
@@ -66,6 +74,7 @@ test("the same bookings, live, from every way in, and the record says who acted 
       "Tue 11:00, for Bia",
       "Wed 15:00, for Assistant",
       "Thu 09:00, for Assistant",
+      "Fri 14:00, for Site visitor",
     ]);
     desk.close();
 
@@ -75,6 +84,7 @@ test("the same bookings, live, from every way in, and the record says who acted 
       "Tue 11:00": "agent concierge for contact Bia",
       "Wed 15:00": "contact by mcp",
       "Thu 09:00": "contact by mcp",
+      "Fri 14:00": "contact by web",
     });
   } finally {
     await runtime.close();
@@ -118,6 +128,10 @@ test("the rules hold at every way in: nobody else can see or cancel Bia's bookin
       _grant: widget.grant,
     });
     assert.ok(pressed.failed);
+    // A visitor on the site, calling the Action straight from its browser.
+    const site = await visitor(runtime, "198.51.100.7");
+    await assert.rejects(site.call("booking.cancel", { booking }));
+    await site.close();
 
     // Bia's booking stands, and the record has nothing else.
     assert.equal(await seen(runtime, "bookings", sam), "Tue 10:00 (tue-10), for Bia");

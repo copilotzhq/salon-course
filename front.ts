@@ -1,13 +1,16 @@
 /**
- * The salon's front ends, for the browser: Copilotz's web shell (the
- * sidebar, the page by address), chat and spaces, and the salon's own (a
- * space's Bookings tab). What the sign-in page says is the salon's too.
+ * The salon's front ends, for the browser. Staff's (`front`): Copilotz's
+ * web shell (the sidebar, the page by address), chat and spaces, and the
+ * salon's own (a space's Bookings tab). What the sign-in page says is the
+ * salon's too. A visitor's (`site`): the salon's site, its chat beside the
+ * bookings panel.
  */
 import { definePlugin, type Plugin } from "copilotz";
 import { webShell } from "copilotz/plugins/interfaces/web";
 import { chatWeb } from "copilotz/plugins/agents/web";
 import { spacesWeb } from "copilotz/plugins/access/web";
 import { bookingsWeb } from "./plugins/bookings/web.tsx";
+import { siteWeb } from "./plugins/site/web.tsx";
 
 const words = definePlugin({
   name: "salon-words",
@@ -15,3 +18,6 @@ const words = definePlugin({
 });
 
 export const front: Plugin[] = [webShell, chatWeb, spacesWeb, bookingsWeb, words];
+
+// The site's own `web.shell` comes after the web shell's, so it's the one drawn.
+export const site: Plugin[] = [webShell, bookingsWeb, siteWeb];

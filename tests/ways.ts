@@ -3,9 +3,13 @@
  * `fetch` (no port is opened):
  *
  * - `assistant`: an MCP client (ChatGPT, Claude, Gemini), posting JSON-RPC
- *   to `/mcp/salon`, naming its conversation as ChatGPT does.
+ *   to `/mcp/salon`, naming its conversation as ChatGPT does;
+ * - `visitor`: a browser on the site, arriving by its chat (`/web/site`),
+ *   then calling and reading through Copilotz's client with its cookie.
  */
-import type { Runtime } from "copilotz";
+import assert from "node:assert/strict";
+import { connect, type Runtime, setClientAddress } from "copilotz";
+import { site } from "../front.ts";
 import { LINKS } from "./kit.ts";
 
 export type Answer = {
@@ -50,4 +54,28 @@ export function assistant(runtime: Runtime, session?: string) {
       return { text: answer.result?.content?.[0]?.text, failed: !!answer.result?.isError, answer };
     },
   };
+}
+
+/** A browser on the site: it arrives by the site's chat, and is a client with its cookie. */
+export async function visitor(runtime: Runtime, address: string) {
+  let cookie = "";
+  const fetch: typeof globalThis.fetch = async (input, init) => {
+    const request = new Request(input, init);
+    if (cookie) request.headers.set("cookie", cookie);
+    const response = await runtime.fetch(setClientAddress(request, address));
+    const set = response.headers.getSetCookie()[0];
+    if (set) cookie = set.split(";")[0];
+    return response;
+  };
+  // As the page does first (`web({ arrive })`): it's let in, and given its cookie.
+  const arrived = await fetch(`${LINKS.origin}/web/site`, {
+    method: "POST",
+    headers: { "content-type": "application/json", origin: LINKS.origin },
+    body: "{}",
+  });
+  assert.equal(arrived.status, 200);
+  // Who it is, as the page's host asks before it connects: a contact, named so in what it reads.
+  const { actor } = await (await fetch(`${LINKS.origin}/connect`, { method: "POST" })).json();
+  const client = await connect(LINKS.origin, { over: "http", fetch, plugins: site });
+  return Object.assign(client, { viewer: { kind: "contact", name: `contact:${actor.id}` } });
 }

@@ -9,13 +9,13 @@
  * contacts: each has a chat of their own at the desk (chat's `thread`), and
  * nothing else. The concierge, the salon's agent, answers every chat there.
  * Assistants outside (ChatGPT, Claude, Gemini) come in over MCP, each
- * conversation a contact.
+ * conversation a contact; so do the site's visitors, by its chat.
  */
 import { type Actor, definePlugin, type Plugin, type Runtime } from "copilotz";
 import { models } from "copilotz/plugins/models";
 import { chat } from "copilotz/plugins/agents";
 import { access } from "copilotz/plugins/access";
-import { mcp } from "copilotz/plugins/interfaces";
+import { mcp, webLines } from "copilotz/plugins/interfaces";
 import type { Widgets } from "copilotz/web/server";
 import { bookings } from "./plugins/bookings/mod.ts";
 
@@ -25,7 +25,7 @@ export const DESK = "desk";
 export type Settings = {
   /** OpenAI's API key; without it, the concierge answers with the offline fake model. */
   openai?: string;
-  /** Where the app is, and a secret of 32 bytes or more: what MCP's ids are made with. */
+  /** Where the app is, and a secret (32 bytes or more) that MCP's and the site's ids come from. */
   links: { origin: string; secret: string };
   /** The widgets assistants draw (`widgetsOf`): without them, MCP answers in text alone. */
   widgets?: Widgets;
@@ -61,6 +61,8 @@ function salon(settings: Settings): Plugin {
         },
       },
       links: settings.links,
+      // The site's chat: a visitor is a contact, in a chat of its own at the desk.
+      web: { site: { in: DESK, agent: "concierge", title: "Site visitor" } },
       // An MCP server at /mcp/salon, for ChatGPT, Claude, Gemini, any MCP client. No sign-in yet:
       // each conversation is a contact, in a chat of its own at the desk.
       mcp: {
@@ -88,7 +90,7 @@ function salon(settings: Settings): Plugin {
 
 /** Every plugin the salon runs, in order. */
 export function plugins(settings: Settings): Plugin[] {
-  return [models, chat, ...access, mcp, bookings, salon(settings)];
+  return [models, chat, ...access, mcp, webLines, bookings, salon(settings)];
 }
 
 /** Sam, and the desk he manages: staff are its members. */

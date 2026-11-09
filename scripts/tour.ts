@@ -1,6 +1,7 @@
 /**
  * Every way in, one after another, in memory: staff at the desk, the
- * salon's own concierge in a customer's chat, an assistant over MCP. Then
+ * salon's own concierge in a customer's chat, an assistant over MCP, a
+ * visitor on the site. Then
  * what the desk sees, and the record. With `OPENAI_API_KEY`, the concierge
  * thinks with OpenAI; without it, with the offline fake model, which echoes.
  *
@@ -12,7 +13,7 @@ import type { Message } from "copilotz/plugins/agents";
 import { memoryStore } from "copilotz/stores/memory";
 import { openDesk, plugins } from "../app.ts";
 import { bookedBy, customer, LINKS, sam, seen } from "../tests/kit.ts";
-import { assistant } from "../tests/ways.ts";
+import { assistant, visitor } from "../tests/ways.ts";
 
 const store = memoryStore();
 const runtime = await createRuntime({
@@ -42,6 +43,15 @@ console.log(`bia       › ${await said(bia.thread)}`);
 const chatgpt = assistant(runtime, "conversation-1");
 const booked = await chatgpt.call("book", { slot: "wed-15" });
 console.log(`assistant › ${booked.text?.split("\n")[0]}`);
+
+// A visitor on the site.
+const site = await visitor(runtime, "198.51.100.7");
+const { thread } = await site.call<{ thread: string }>("chat.send", {
+  text: "Hello, is Friday afternoon free? Please book it.",
+});
+await runtime.idle();
+console.log(`site      › ${await said(thread)}`);
+await site.close();
 
 console.log(`\nThe desk sees:\n${await seen(runtime, "bookings", sam)}`);
 console.log("\nThe record:");
