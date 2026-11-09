@@ -13,7 +13,13 @@
 import { type Actor, createRuntime, definePlugin, type Plugin, type Runtime } from "copilotz";
 import type { LlmAdapter, LlmRequest } from "copilotz/plugins/models";
 import { memoryStore } from "copilotz/stores/memory";
-import { DESK, openDesk, plugins } from "../app.ts";
+import { DESK, openDesk, plugins, type Settings } from "../app.ts";
+
+/** Where the app is, and its secret (32 bytes or more). */
+export const LINKS = {
+  origin: "https://salon.example",
+  secret: "a-secret-for-the-salon-tests-0123456789",
+};
 
 /** Staff: a person, at the desk. His calls are there (`in`), as a page of the desk says. */
 export const sam: Actor = { kind: "person", id: "sam", in: DESK };
@@ -40,7 +46,11 @@ export function scripted(moves: Move[]) {
 }
 
 /** The salon, in memory: the concierge on a script, Sam, and the desk he manages. */
-export async function salon(options: { moves?: Move[]; plugins?: Plugin[] } = {}) {
+export async function salon(options: {
+  moves?: Move[];
+  plugins?: Plugin[];
+  settings?: Partial<Settings>;
+} = {}) {
   const store = memoryStore();
   const concierge = scripted(options.moves ?? []);
   // The `concierge` model alias, swapped for the script: a provider and its adapter.
@@ -54,7 +64,7 @@ export async function salon(options: { moves?: Move[]; plugins?: Plugin[] } = {}
   });
   const runtime = await createRuntime({
     store,
-    plugins: [...plugins(), script, ...options.plugins ?? []],
+    plugins: [...plugins({ links: LINKS, ...options.settings }), script, ...options.plugins ?? []],
   });
   await openDesk(runtime);
   return { runtime, store, concierge };

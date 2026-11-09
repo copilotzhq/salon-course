@@ -79,3 +79,6 @@ Each chapter says which scripts it adds: `npm run hello`, `dev`, `terminal`, `to
 4. [Its own agent](getting-started/04-its-own-agent.md): the concierge: the salon's agent, with four
    tools that call the same Actions, a text View for each that the model reads, acting for whoever
    it talks with.
+5. [ChatGPT, Claude and Gemini, over MCP](getting-started/05-chatgpt-claude-and-gemini-over-mcp.md):
+   the concierge's tools, opened to assistants outside. Each conversation is a contact with a chat
+   of its own, under the same rules.

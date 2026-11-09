@@ -188,3 +188,47 @@ staff-only tool, last), `package.json` (`terminal`).
    - EN: Give it a `next_free` tool. Next: the same tools, for ChatGPT, Claude and Gemini.
    - PT: Dê a ele uma ferramenta `next_free`. Próximo: as mesmas ferramentas, pro ChatGPT, Claude e
      Gemini.
+
+## 5 · ChatGPT, Claude and Gemini, over MCP · ChatGPT, Claude e Gemini, por MCP
+
+Chapter 5 (`05-chatgpt-claude-and-gemini-over-mcp.md`), tag `chapter-5`. Files: `app.ts` (`mcp`,
+`links`), `server.ts`, `terminal.ts`, `tests/kit.ts` (`LINKS`), `tests/ways.ts` (new),
+`tests/mcp.test.ts`, `.env.example`.
+
+1. **intro** · `title`
+   - EN: Customers ask ChatGPT, Claude and Gemini. The salon answers there too, with the same tools.
+   - PT: Os clientes perguntam ao ChatGPT, ao Claude e ao Gemini. O salão responde lá também, com as
+     mesmas ferramentas.
+2. **pain** · `card` "An integration per assistant"
+   - EN: A separate integration per assistant is a third copy of the booking logic.
+   - PT: Uma integração por assistente é uma terceira cópia da lógica de reservas.
+3. **problem** · `card` "Strangers, safely" (the same tools; its own bookings; the desk sees)
+   - EN: The same tools, the same rules, each conversation with its own bookings only.
+   - PT: As mesmas ferramentas, as mesmas regras, cada conversa só com as suas reservas.
+4. **solution** · `type app.ts` (`mcp.salon`, `links`)
+   - EN: A few lines of settings: a server at `/mcp/salon`, its space, the tools it offers, each
+     with its View, or the app won't start.
+   - PT: Umas linhas de configuração: um servidor em `/mcp/salon`, o space, as ferramentas que
+     oferece, cada uma com a sua View, ou o app não sobe.
+5. **solution** · `card` "A conversation is a contact" (no sign-in yet; handles; "for Assistant")
+   - EN: There's no MCP sign-in yet, so each conversation is a contact, and the desk says "for
+     Assistant". Honest, and safe.
+   - PT: Ainda não há login por MCP, então cada conversa é um contato, e o balcão diz "for
+     Assistant". Honesto, e seguro.
+6. **solution** · `card` "Connecting" (Claude Code; ChatGPT through a tunnel; Gemini's limits)
+   - EN: Claude Code takes the local address. ChatGPT needs a tunnel. Gemini takes it in English,
+     with Keep Activity on, and confirms every write.
+   - PT: O Claude Code aceita o endereço local. O ChatGPT precisa de um túnel. O Gemini aceita em
+     inglês, com a Atividade ligada, e confirma cada escrita.
+7. **check** · `run curl` (book, a new conversation's cancel, `my_bookings` with the handle) beside
+   `browser` (the desk's tab)
+   - EN: Book with curl, and watch Sam's tab. Another conversation can't cancel it.
+   - PT: Reserve com curl, e veja a aba do Sam. Outra conversa não consegue cancelar.
+8. **unlocks** · `card` "What this unlocks" (presence in assistants; strangers, safely; honest about
+   who)
+   - EN: Presence in the assistants, from the same code, under the same rules.
+   - PT: Presença nos assistentes, com o mesmo código, sob as mesmas regras.
+9. **challenge** · `card` "Your challenge" (Claude Code books Friday; next: every way in)
+   - EN: Connect Claude Code and book Friday with the desk open. Next: every way in, at once.
+   - PT: Conecte o Claude Code e reserve sexta com o balcão aberto. Próximo: todas as entradas de
+     uma vez.

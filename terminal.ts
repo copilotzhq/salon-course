@@ -7,6 +7,7 @@
  *   npm run terminal
  */
 import process from "node:process";
+import { randomBytes } from "node:crypto";
 import { createRuntime } from "copilotz";
 import { memoryStore } from "copilotz/stores/memory";
 import { chatTerminal } from "copilotz/plugins/agents/terminal";
@@ -19,7 +20,10 @@ import { bookingsTerminal } from "./plugins/bookings/terminal.ts";
 const runtime = await createRuntime({
   store: memoryStore(),
   plugins: [
-    ...plugins({ openai: process.env.OPENAI_API_KEY }),
+    ...plugins({
+      openai: process.env.OPENAI_API_KEY,
+      links: { origin: "http://127.0.0.1:8080", secret: randomBytes(32).toString("hex") },
+    }),
     terminalPlugin,
     terminalShell,
     chatTerminal,

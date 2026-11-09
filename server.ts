@@ -6,9 +6,11 @@
  *   npm run dev          # http://127.0.0.1:8080/space/desk
  *
  * Staff sign in by name, from this machine only (`devSignIn`): Sam manages
- * the desk.
+ * the desk. Assistants post to /mcp/salon (ChatGPT needs it public: a
+ * tunnel's https address, and `SALON_ORIGIN` set to it, without devSignIn).
  */
 import process from "node:process";
+import { randomBytes } from "node:crypto";
 import { createRuntime, definePlugin } from "copilotz";
 import { memoryStore } from "copilotz/stores/memory";
 import { devSignIn } from "copilotz/plugins/access";
@@ -17,11 +19,16 @@ import { bundle, listen } from "copilotz/web/node";
 import { DESK, openDesk, plugins } from "./app.ts";
 
 const port = Number(process.env.PORT ?? 8080);
+const origin = process.env.SALON_ORIGIN ?? `http://127.0.0.1:${port}`;
+// What MCP's ids are sealed with: 32 bytes or more. A new one each start, unless set.
+const secret = process.env.SALON_SECRET || randomBytes(32).toString("hex");
+const local = new URL(origin).hostname === "127.0.0.1";
+
 const runtime = await createRuntime({
   store: memoryStore(),
   plugins: [
-    ...plugins({ openai: process.env.OPENAI_API_KEY }),
-    devSignIn,
+    ...plugins({ openai: process.env.OPENAI_API_KEY, links: { origin, secret } }),
+    ...(local ? [devSignIn] : []),
     webPage,
     definePlugin({
       name: "page",
@@ -34,7 +41,7 @@ const runtime = await createRuntime({
 await openDesk(runtime);
 
 const server = await listen(runtime.fetch, { hostname: "127.0.0.1", port });
-console.log(`The salon on ${server.url}space/${DESK}`);
+console.log(`The salon on ${server.url}space/${DESK}, and assistants' MCP at ${origin}/mcp/salon`);
 process.once("SIGINT", async () => {
   await server.shutdown();
   await runtime.close({ drain: 8_000 });
